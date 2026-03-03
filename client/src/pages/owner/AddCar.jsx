@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import Title from "../../components/owner/Title.jsx";
-import {assets}  from "../../assets/assets.js";
+import React, { useState } from 'react';
+import Title from '../../components/owner/Title.jsx';
+import { assets } from '../../assets/assets.js';
 
 const AddCar = () => {
   const [image, setImage] = useState(null);
   const [car, setCar] = useState({
-    brand: "",
-    model: "",
+    brand: '',
+    model: '',
     year: 0,
     pricePerDay: 0,
-    category: "",
-    transmission: "",
-    fuel_type: "",
+    category: '',
+    transmission: '',
+    fuel_type: '',
     seating_capacity: 0,
-    location: "",
-    description: "",
+    location: '',
+    description: '',
   });
 
   const onSubmitHandle = async (e) => {
@@ -31,12 +31,54 @@ const AddCar = () => {
         className="flex flex-col gap-5 text-gray-500 text-sm mt-6 max-w-xl"
       >
         {/* car image */}
-        <div className="flex items-center w-full gap-3">
+        <div className="flex items-center w-full gap-2">
           <label htmlFor="car-image">
-            <img src={image ? URL.createObjectURL(image) : assets.upload_icon }  className='h-14 rounded cursor-pointer' alt="" />
-            <input type="file" id="car-image" accept="image/*" hidden onChange={e=>setImage(e.target.files[0])}/>
-          </label>  
+            <img
+              src={image ? URL.createObjectURL(image) : assets.upload_icon}
+              className="h-14 rounded cursor-pointer"
+              alt=""
+            />
+            <input
+              type="file"
+              id="car-image"
+              accept="image/*"
+              hidden
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          </label>
           <p className="font-sm  text-gray-500">Upload a picture of your car</p>
+        </div>
+
+        {/* car brand and model */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col w-full">
+            <label htmlFor="brand">
+              Brand
+            </label>
+            <input
+              type="text"
+              placeholder="BMW, Audi,Honda..."
+              required
+              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none "
+              value={car.brand} 
+              onChange={e=>setCar({...car,brand:e.target.value})}
+            />
+          </div>
+
+          <div className="flex flex-col w-full">
+            <label htmlFor="brand">
+             Model
+            </label>
+            <input
+              type="text"
+              placeholder="e.g X5, AClass, M3..."
+              required
+              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none "
+              value={car.model}
+              onChange={e=>setCar({...car,model:e.target.value})}
+            />
+          </div>
+
         </div>
       </form>
     </div>

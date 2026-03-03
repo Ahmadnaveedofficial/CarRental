@@ -224,7 +224,18 @@ export const dummyMyBookingsData = [
         "status": "confirmed",
         "price": 440,
         "createdAt": "2025-06-10T09:44:25.410Z",
-    }
+    },
+      {
+        "_id": "68482bcc98eb9722b7751f70",
+        "car": dummyCarData[0],
+        "user": "6847f7cab3d8daecdb517095",
+        "owner": "6847f7cab3d8daecdb517095",
+        "pickupDate": "2025-06-13T00:00:00.000Z",
+        "returnDate": "2025-06-14T00:00:00.000Z",
+        "status": "confirmed",
+        "price": 440,
+        "createdAt": "2025-06-10T12:57:48.244Z",
+    },
 ]
 
 export const dummyDashboardData = {
@@ -234,7 +245,7 @@ export const dummyDashboardData = {
     "completedBookings": 2,
     "recentBookings": [
         dummyMyBookingsData[0],
-        dummyMyBookingsData[1]
+        dummyMyBookingsData[1],
     ],
     "monthlyRevenue": 840
 }

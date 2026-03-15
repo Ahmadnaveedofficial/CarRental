@@ -35,7 +35,7 @@ const Testimonial = () => {
         choose StayVenture for their luxury accommodations around the world."
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18 cursor-pointer">
         {testimonials.map((testimonial, index) => (
           <div
             key={index}

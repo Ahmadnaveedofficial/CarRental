@@ -18,3 +18,6 @@ dbConfig()
   .catch((error) => {
     console.error("DB connection Failed!! : ", error);
   });
+
+
+  export default app;

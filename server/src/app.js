@@ -6,7 +6,7 @@ import errorHandler from "./utils/errorHandler.js";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://car-rental-roan-nu.vercel.app",
     // origin: ["*", "http://localhost:5173"],
     credentials: true,
   })

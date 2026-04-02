@@ -8,8 +8,8 @@ dotenv.config({
 
 dbConfig()
   .then(() => {
-    app.listen(process.env.PORT,()=>{
-        console.log(`Server is running on port ${process.env.PORT}...`);
+    app.listen(process.env.PORT, () => {
+      console.log(`Server is running on port ${process.env.PORT}...`);
     });
     app.on("error", (error) => {
       console.log("app id failed!!!!!!!!", error);

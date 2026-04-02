@@ -2,6 +2,7 @@
 
 
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 *{
    font-family: "Outfit", sans-serif;

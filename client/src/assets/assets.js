@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+import logo from "./logo.png";
 import gmail_logo from "./gmail_logo.svg";
 import facebook_logo from "./facebook_logo.svg";
 import instagram_logo from "./instagram_logo.svg";
@@ -40,10 +40,12 @@ import car_image1 from "./car_image1.png"
 import car_image2 from "./car_image2.png"
 import car_image3 from "./car_image3.png"
 import car_image4 from "./car_image4.png"
+import edit_button from "./edit_button.png"
 
-export const cityList = ['New York', 'Los Angeles', 'Houston', 'Chicago']
+export const cityList = ['New York', 'Los Angeles', 'Houston', 'Chicago','Lahore']
 
 export const assets = {
+    edit_button,
     logo,
     gmail_logo,
     facebook_logo,
@@ -91,7 +93,7 @@ export const assets = {
 export const menuLinks = [
     { name: "Home", path: "/" },
     { name: "Cars", path: "/cars" },
-    { name: "My Bookings", path: "/my-bookings" },
+    {name:"Blogs",path :"/blogs"}
 ]
 
 export const ownerMenuLinks = [
@@ -99,6 +101,8 @@ export const ownerMenuLinks = [
     { name: "Add car", path: "/owner/add-car", icon: addIcon, coloredIcon: addIconColored },
     { name: "Manage Cars", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
     { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
+     { name: "Add Blog", path: "/owner/add-blog", icon: addIcon, coloredIcon: addIconColored },
+    { name: "Manage Blogs", path: "/owner/manage-blogs", icon: listIcon, coloredIcon: listIconColored },
 ]
 
 export const dummyUserData = {

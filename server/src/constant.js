@@ -1,3 +1,3 @@
-const DBNAME = 'CarRental';
+const DBNAME = "CarRental";
 
 export default DBNAME;

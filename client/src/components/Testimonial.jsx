@@ -1,26 +1,27 @@
-import React from "react";
-import Title from "./Title.jsx";
-import { assets } from "../assets/assets.js";
+import React from 'react';
+import Title from './Title.jsx';
+import { assets } from '../assets/assets.js';
+import { motion } from 'motion/react';
 
 const Testimonial = () => {
   const testimonials = [
     {
-      name: "Ibraheem Rauf",
-      location: "Lahore, Pakistan",
+      name: 'Ibraheem Rauf',
+      location: 'Lahore, Pakistan',
       image: assets.testimonial_image_1,
       testimonial:
-        "I have rented cars from various companies, but the experience with CarRental was exceptional.",
+        'I have rented cars from various companies, but the experience with CarRental was exceptional.',
     },
     {
-      name: "Nawab Haider",
-      location: "Lahore, Pakistan",
+      name: 'Nawab Haider',
+      location: 'Lahore, Pakistan',
       image: assets.testimonial_image_2,
       testimonial:
-        "CarRental made my trip so much easier. The car was delivered right to my door, and the customer service was fantastic!",
+        'CarRental made my trip so much easier. The car was delivered right to my door, and the customer service was fantastic!',
     },
     {
-      name: "Ahmad Naveed",
-      location: "Lahore, Pakistan",
+      name: 'Ahmad Naveed',
+      location: 'Lahore, Pakistan',
       image: assets.testimonial_image_1,
       testimonial:
         "I highly recommend CarRental! Their fleet is amazing, and I always feel like I'm getting the best deal with excellent service.",
@@ -37,7 +38,11 @@ const Testimonial = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18 cursor-pointer">
         {testimonials.map((testimonial, index) => (
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.2, ease: 'easeOut' }}
+            viewport={{ once: true, amount: 0.3 }}
             key={index}
             className="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-1 transition-all duration-500"
           >
@@ -59,10 +64,8 @@ const Testimonial = () => {
                   <img key={index} src={assets.star_icon} alt="star-icon" />
                 ))}
             </div>
-            <p className="text-gray-500 max-w-90 mt-4 font-light">
-              "{testimonial.testimonial}"
-            </p>
-          </div>
+            <p className="text-gray-500 max-w-90 mt-4 font-light">"{testimonial.testimonial}"</p>
+          </motion.div>
         ))}
       </div>
     </div>

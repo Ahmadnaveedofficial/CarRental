@@ -12,26 +12,64 @@ import AddCar from './pages/owner/AddCar.jsx';
 import ManageCar from './pages/owner/ManageCar.jsx';
 import ManageBookings from './pages/owner/ManageBookings.jsx';
 import Login from './components/Login.jsx';
+import { Toaster } from 'react-hot-toast';
+import { useAppContext } from './context/AppContext.jsx';
+import ProtectedOwnerRoute from './components/owner/ProtectedOwnerRoute.jsx';
+import Blogs from './pages/Blogs.jsx';
+import UserProfile from './pages/UserProfile.jsx';
+import BlogDetails from './pages/BlogDetails.jsx';
+import AddBlog from './pages/owner/AddBlog.jsx';
+import ManageBlogs from './pages/owner/ManageBlogs.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
+  const { showLogin } = useAppContext();
   const isOwnerPath = useLocation().pathname.startsWith('/owner');
   return (
     <>
-      {showLogin && <Login setShowLogin={setShowLogin} />}
+      <Toaster />
+      {showLogin && <Login />}
 
-      {!isOwnerPath && <Navbar setShowLogin={setShowLogin} />}
+      {!isOwnerPath && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/car-details/:id" element={<CarDetails />} />
         <Route path="/cars" element={<Cars />} />
-        <Route path="/my-bookings" element={<MyBooking />} />
-        <Route path="/owner" element={<Layout />}>
+        <Route
+          path="/my-bookings"
+          element={
+            <ProtectedRoute>
+              <MyBooking />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:slug" element={<BlogDetails />} />
+
+        <Route
+          path="/owner"
+          element={
+            <ProtectedOwnerRoute>
+              <Layout />
+            </ProtectedOwnerRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="add-car" element={<AddCar />} />
           <Route path="manage-cars" element={<ManageCar />} />
           <Route path="manage-bookings" element={<ManageBookings />} />
+          <Route path="add-blog" element={<AddBlog />} />
+          <Route path="manage-blogs" element={<ManageBlogs />} />
         </Route>
       </Routes>
 

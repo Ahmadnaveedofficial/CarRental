@@ -52,12 +52,12 @@ const googleAuth = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
     })
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
     })
     .json(
       new apiResponse(200, "Google login successful", {

@@ -21,8 +21,7 @@ export const AppProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState([]);
 
-
-  // function if check user is logged in
+  // fetchUser
   const fetchUser = async () => {
     try {
       const { data } = await axios.get('/api/v1/users/data');
@@ -30,7 +29,6 @@ export const AppProvider = ({ children }) => {
         setUser(data.data);
         setIsOwner(data.data?.role === 'owner');
       } else {
-        // navigate('/');
         setUser(null);
         setIsOwner(false);
       }
@@ -41,14 +39,12 @@ export const AppProvider = ({ children }) => {
         return;
       }
       toast.error(error?.response?.data?.message || error.message);
-      setUser(null);
-      setIsOwner(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // function to fetch all cars from the server
+  // fetchCars
   const fetchCars = async () => {
     try {
       const { data } = await axios.get('/api/v1/users/cars');
@@ -57,6 +53,7 @@ export const AppProvider = ({ children }) => {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
+
   const fetchBlogs = async () => {
     try {
       const { data } = await axios.get('/api/v1/blogs/');
@@ -66,7 +63,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // function to handle logout
+  // logout
   const logout = async () => {
     try {
       const { data } = await axios.post('/api/v1/users/logout');
@@ -83,29 +80,18 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // interceptor
   useEffect(() => {
-    // sirf non-auth routes par retry karo
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
 
-        //  Yeh routes par retry bilkul mat karo
-        const skipRetryUrls = [
-          '/api/v1/users/data',
-          '/api/v1/users/refresh-token',
-          '/api/v1/users/login',
-        ];
+        const skipRetryUrls = ['/api/v1/users/refresh-token', '/api/v1/users/login'];
 
-        const shouldSkip = skipRetryUrls.some((url) =>
-          originalRequest.url?.includes(url)
-        );
+        const shouldSkip = skipRetryUrls.some((url) => originalRequest.url?.includes(url));
 
-        if (
-          error.response?.status === 401 &&
-          !originalRequest._retry &&
-          !shouldSkip
-        ) {
+        if (error.response?.status === 401 && !originalRequest._retry && !shouldSkip) {
           originalRequest._retry = true;
           try {
             await axios.post('/api/v1/users/refresh-token');
@@ -118,17 +104,40 @@ export const AppProvider = ({ children }) => {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
 
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
- const init = async () => {
+
+  // auto refresh
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(
+      async () => {
+        try {
+          await axios.post('/api/v1/users/refresh-token');
+        } catch (error) {
+          setUser(null);
+          setIsOwner(false);
+        }
+      },
+      14 * 60 * 1000,
+    ); // 14 minutes
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // init
+
+  const init = async () => {
     await Promise.all([fetchUser(), fetchCars(), fetchBlogs()]);
   };
+
   useEffect(() => {
-  init();
-}, []);
+    init();
+  }, []);
 
   const value = {
     navigate,
@@ -154,10 +163,10 @@ export const AppProvider = ({ children }) => {
     blogs,
     setBlogs,
   };
+
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => {
   return useContext(AppContext);
 };
-

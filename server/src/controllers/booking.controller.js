@@ -169,9 +169,10 @@ const changeBookingStatus = asyncHandler(async (req, res) => {
     .status(200)
     .json(new apiResponse(200, "Booking status updated successfully", booking));
 });
+
+
 // user Delete Booking
 
- // user Cancel Booking - only before pickup date
 const userCancelBooking = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { bookingId } = req.body;

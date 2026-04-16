@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const LOGO_URL="https://res.cloudinary.com/dk9shqzdu/image/upload/v1775067795/logo_wfchsj.png";
+
 const sendBookingEmail = async (userEmail, userName, car, booking) => {
   await transporter.sendMail({
     from: `"PrimeDrive" <${process.env.EMAIL_USER}>`,

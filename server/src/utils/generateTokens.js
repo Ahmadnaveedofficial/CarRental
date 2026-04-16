@@ -10,8 +10,21 @@ const generateAccessAndRefreshToken = async (userId) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+     const refreshTokenHash = crypto
+      .createHash("sha256")
+      .update(refreshToken)
+      .digest("hex");
+
+    // Create a new session document for this device
+    await Session.create({
+      userId: user._id,
+      refreshTokenHash,
+      ip: ip || "unknown",
+      userAgent: userAgent || "unknown",
+    });
+
+    // user.refreshToken = refreshToken;
+    // await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
     throw new apiError(

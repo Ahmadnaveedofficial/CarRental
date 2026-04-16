@@ -52,9 +52,9 @@ const userSchema = new Schema(
       public_id: String,
       url: String,
     },
-    // refreshToken: {
-    //   type: String,
-    // },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -89,17 +89,12 @@ const loginUser = asyncHandler(async (req, res) => {
       .status(401)
       .json(new apiResponse(401, "Invalid user credentials", null));
   }
-
-  const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
-  const userAgent = req.headers["user-agent"] || "unknown";
-
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-    user._id,
-    { ip, userAgent }
+    user._id
   );
 
   const loggedInUser = await User.findById(user._id).select(
-    "-password"
+    "-password -refreshToken"
   );
 
   return res
@@ -123,21 +118,15 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // logout user
 const logoutUser = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
 
-   const incomingRefreshToken = req.cookies.refreshToken;
+  if (refreshToken) {
+    const user = await User.findOne({ refreshToken });
 
- 
-  if (incomingRefreshToken) {
-    const hash = crypto
-      .createHash("sha256")
-      .update(incomingRefreshToken)
-      .digest("hex");
-
-    // Only revoke the session matching this device's token
-    await Session.findOneAndUpdate(
-      { refreshTokenHash: hash, revoked: false },
-      { revoked: true }
-    );
+    if (user) {
+      user.refreshToken = null;
+      await user.save({ validateBeforeSave: false });
+    }
   }
 
   return res
@@ -179,7 +168,7 @@ const getCars = asyncHandler(async (req, res) => {
 
 const updateUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const { name, phone, address, dob, gender, cnic } = req.body;
+   const { name, phone, address, dob, gender, cnic } = req.body;
 
   if (
     [name, phone, address, dob, gender].every(
@@ -191,7 +180,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       .json(new apiResponse(400, "At least one field is required"));
   }
 
-  if (cnic && !/^\d{5}-\d{7}-\d{1}$/.test(cnic)) {
+   if (cnic && !/^\d{5}-\d{7}-\d{1}$/.test(cnic)) {
     return res
       .status(400)
       .json(new apiResponse(400, "Invalid CNIC format. Use: 35202-1234567-1"));
@@ -207,7 +196,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (address !== undefined) user.address = address.trim();
   if (dob !== undefined) user.dob = dob;
   if (gender !== undefined) user.gender = gender;
-  if (cnic !== undefined) user.cnic = cnic.trim();
+   if (cnic !== undefined) user.cnic = cnic.trim();
 
   await user.save({ validateBeforeSave: false });
 
@@ -289,97 +278,43 @@ const getCarBookedDates = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, "Booked dates fetched", bookings));
 });
 
-// refreshAccessToken
-// const refreshAccessToken = asyncHandler(async (req, res) => {
-//   const incomingRefreshToken = req.cookies.refreshToken;
-
-//   if (!incomingRefreshToken) {
-//     return res
-//       .status(401)
-//       .json(new apiResponse(401, "Please Login to book a car"));
-//   }
-
-//   try {
-//     const decodedToken = jwt.verify(
-//       incomingRefreshToken,
-//       process.env.REFRESH_TOKEN_SECRET
-//     );
-
-//     const user = await User.findById(decodedToken?._id);
-
-//     if (!user) {
-//       throw new apiError(401, "Invalid refresh token");
-//     }
-
-//     if (incomingRefreshToken !== user.refreshToken) {
-//       throw new apiError(401, "Refresh token expired or reused");
-//     }
-
-//     const { accessToken, refreshToken: newRefreshToken } =
-//       await generateAccessAndRefreshToken(user._id);
-
-//     const options = {
-//       httpOnly: true,
-//       secure: true,
-//       sameSite: "None",
-//     };
-
-//     return res
-//       .status(200)
-//       .cookie("accessToken", accessToken, options)
-//       .cookie("refreshToken", newRefreshToken, options)
-//       .json(new apiResponse(200, "Token refreshed successfully", accessToken));
-//   } catch (error) {
-//     throw new apiError(401, error.message || "Invalid refresh token");
-//   }
-// });
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
 
   if (!incomingRefreshToken) {
-    return res.status(401).json(new apiResponse(401, "Please login to continue"));
+    return res.status(401).json(new apiResponse(401, "Please Login to book a car"));
   }
 
   try {
-    const decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
 
-    const user = await User.findById(decoded._id);
-    if (!user) throw new apiError(401, "Invalid refresh token");
+    const user = await User.findById(decodedToken?._id);
 
-    // Hash the incoming token and look it up in the Session collection
-    const hash = crypto
-      .createHash("sha256")
-      .update(incomingRefreshToken)
-      .digest("hex");
-
-    const session = await Session.findOne({
-      userId: user._id,
-      refreshTokenHash: hash,
-      revoked: false,
-    });
-
-    if (!session) {
-      throw new apiError(401, "Session expired or revoked — please login again");
+    if (!user) {
+      throw new apiError(401, "Invalid refresh token");
     }
 
-    // Revoke the old session (token rotation)
-    session.revoked = true;
-    await session.save();
-
-    // Issue a fresh token pair and create a new session
-    const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
-    const userAgent = req.headers["user-agent"] || "unknown";
+    if (incomingRefreshToken !== user.refreshToken) {
+      throw new apiError(401, "Refresh token expired or reused");
+    }
 
     const { accessToken, refreshToken: newRefreshToken } =
-      await generateAccessAndRefreshToken(user._id, { ip, userAgent });
+      await generateAccessAndRefreshToken(user._id);
 
-    const cookieOptions = { httpOnly: true, secure: true, sameSite: "None" };
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
 
     return res
       .status(200)
-      .cookie("accessToken", accessToken, cookieOptions)
-      .cookie("refreshToken", newRefreshToken, cookieOptions)
-      .json(new apiResponse(200, "Token refreshed successfully"));
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", newRefreshToken, options)
+      .json(new apiResponse(200, "Token refreshed successfully", accessToken));
   } catch (error) {
     throw new apiError(401, error.message || "Invalid refresh token");
   }
